@@ -1,0 +1,35 @@
+name: OntaDev_Xray
+version: '${project.version}'
+main: com.ontadev.xray.OntaDevXrayPlugin
+api-version: '1.16'
+load: POSTWORLD
+authors: [ OntaDev ]
+
+depend:
+  - OntaDev_Libs
+  - ProtocolLib
+
+# Команда /xray регистрируется динамически через OntaDev_Libs, поэтому здесь не объявлена.
+
+permissions:
+  lamp.use:
+    description: Использовать лампу (активировать подсветку)
+    default: true
+  lamp.gui:
+    description: Открыть личное GUI лампы (какие подсветки видеть)
+    default: true
+  lamp.gui.edit:
+    description: Открыть GUI редактирования параметров конкретной лампы
+    default: op
+  lamp.materials:
+    description: Открыть GUI глобального списка материалов (просмотр)
+    default: op
+  lamp.materials.edit:
+    description: Редактировать глобальный список материалов (добавление/удаление/цвет)
+    default: op
+  lamp.lamp.edit:
+    description: Изменять параметры конкретной лампы (radius/cooldown/maxHighlightedBlocks/материалы)
+    default: op
+  lamp.admin:
+    description: Команды администратора (выдача ламп/топлива, reload)
+    default: op
