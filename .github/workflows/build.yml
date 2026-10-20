@@ -1,0 +1,57 @@
+name: Сборка проекта
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: self-hosted
+    # Репозиторий публичный, а раннер собственный: код из форков на нём не запускаем
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # com.ontadev:libs ставится в локальный .m2 этого же self-hosted раннера
+      # workflow'ом OntaDev_Libs (mvn install), поэтому отдельно скачивать её не нужно
+      - name: Build with Maven
+        run: mvn -B clean package --file pom.xml
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: OntaDev_Xray.jar
+          path: target/OntaDev_Xray.jar
+          if-no-files-found: error
+
+      - name: Extract version from pom.xml
+        id: maven-metadata
+        run: |
+          version=$(mvn -q -DforceStdout -Dexpression=project.version help:evaluate)
+          echo "version=${version}" >> $GITHUB_OUTPUT
+
+      - name: Create or Update Release
+        if: github.event_name != 'pull_request'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.maven-metadata.outputs.version }}
+          name: OntaDev_Xray v${{ steps.maven-metadata.outputs.version }}
+          body: "Автоматический релиз версии ${{ steps.maven-metadata.outputs.version }}"
+          artifacts: target/OntaDev_Xray.jar
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
