@@ -49,10 +49,16 @@ public class MaterialManager {
 
         log.info("Global materials list is empty, seeding defaults");
         add(Material.STONE, ChatColor.WHITE);
-        add(Material.DIAMOND_ORE, ChatColor.AQUA);
-        add(Material.GOLD_ORE, ChatColor.YELLOW);
-        add(Material.REDSTONE_ORE, ChatColor.RED);
-        add(Material.EMERALD_ORE, ChatColor.GREEN);
+        addWithVariants(Material.DIAMOND_ORE, ChatColor.AQUA);
+        addWithVariants(Material.GOLD_ORE, ChatColor.YELLOW);
+        addWithVariants(Material.REDSTONE_ORE, ChatColor.RED);
+        addWithVariants(Material.EMERALD_ORE, ChatColor.GREEN);
+    }
+
+    /** Руда и её глубинная (deepslate) версия того же цвета: в слое сланца обычной руды нет. */
+    private void addWithVariants(Material material, ChatColor color) {
+        add(material, color);
+        for (Material variant : MaterialVariants.of(material)) addIfAbsent(variant, color);
     }
 
     public List<MaterialEntry> getAll() {

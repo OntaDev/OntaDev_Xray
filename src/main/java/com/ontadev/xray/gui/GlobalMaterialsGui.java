@@ -276,7 +276,7 @@ public class GlobalMaterialsGui extends AbstractMenu {
 
         event.setCancelled(true);
         ItemStack dragged = event.getOldCursor();
-        if (dragged != null && dragged.getType() != Material.AIR && event.getWhoClicked() instanceof Player) {
+        if (dragged.getType() != Material.AIR && event.getWhoClicked() instanceof Player) {
             tryAdd((Player) event.getWhoClicked(), dragged.getType());
         }
         return true;
@@ -310,6 +310,7 @@ public class GlobalMaterialsGui extends AbstractMenu {
         pickingColorByPlayer.remove(snapshot.uuid());
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean requireEditPermission(Player player) {
         if (player.hasPermission("lamp.materials.edit")) return true;
         player.sendMessage(ChatColor.RED + "У вас нет прав изменять список материалов (lamp.materials.edit).");

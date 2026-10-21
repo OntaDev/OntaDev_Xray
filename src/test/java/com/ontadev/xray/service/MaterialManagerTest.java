@@ -58,4 +58,27 @@ class MaterialManagerTest {
         assertEquals(2, manager.getAll().size());
         assertTrue(manager.findByMaterial(Material.GOLD_ORE).isPresent());
     }
+
+    @Test
+    void theDefaultFilterHasEveryStandardOreTogetherWithItsDeepslateVersion() {
+        org.junit.jupiter.api.Assumptions.assumeTrue(Material.getMaterial("DEEPSLATE_DIAMOND_ORE") != null,
+                "в API 1.16.5 глубинной руды нет, проверка идёт только на новых версиях");
+        MaterialRepository empty = mock(MaterialRepository.class);
+        when(empty.findAllOrdered()).thenReturn(List.of());
+        java.util.concurrent.atomic.AtomicInteger ids = new java.util.concurrent.atomic.AtomicInteger();
+        when(empty.save(any(MaterialEntry.class))).thenAnswer(invocation -> {
+            MaterialEntry entry = invocation.getArgument(0);
+            entry.setId(ids.incrementAndGet());
+            return entry;
+        });
+
+        MaterialManager seeded = new MaterialManager(empty);
+
+        for (Material ore : List.of(Material.DIAMOND_ORE, Material.GOLD_ORE, Material.REDSTONE_ORE, Material.EMERALD_ORE)) {
+            Material deepslate = Material.getMaterial("DEEPSLATE_" + ore.name());
+            MaterialEntry plain = seeded.findByMaterial(ore).orElseThrow();
+            MaterialEntry deep = seeded.findByMaterial(deepslate).orElseThrow(() -> new AssertionError("нет " + deepslate));
+            assertEquals(plain.getColor(), deep.getColor(), "цвет глубинной руды совпадает с обычной: " + ore);
+        }
+    }
 }

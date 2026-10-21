@@ -208,6 +208,7 @@ public class HighlightManager {
         int cy = center.getBlockY();
         int cz = center.getBlockZ();
         int radiusSquared = radius * radius;
+        int minY = world.getMinHeight();
         int maxY = world.getMaxHeight();
 
         PriorityQueue<Candidate> nearest = new PriorityQueue<>(
@@ -225,7 +226,7 @@ public class HighlightManager {
 
                 for (int dy = -radius; dy <= radius; dy++) {
                     int y = cy + dy;
-                    if (y < 0 || y >= maxY) continue;
+                    if (y < minY || y >= maxY) continue;
 
                     int distanceSquared = dx * dx + dy * dy + dz * dz;
                     if (distanceSquared > radiusSquared) continue;
